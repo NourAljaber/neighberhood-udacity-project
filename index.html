@@ -34,17 +34,16 @@
 		<a class="fonts">Location</a>
 	</ul>
 	<ul class="list-group" data-bind="foreach: locations">
-		<a href="#" id = markers class="list-group-item list-group-item-action" data-bind="text: title"></a>
+		<a href="#" class="list-group-item list-group-item-action" data-bind="text: title"></a>
 	</ul>
-</div>
+</div> 
 									<!-- Search box  -->
-
-<form class="navbar-form navbar-left">
-	<div class="form-group">
-		<input type="text" class="form-control" placeholder="Search">
-		</div>
-		<button type="submit" class="btn btn-default">Submit</button>
-	</form>
+<form>
+<div>
+          <input id="search-within-time-text" type="text" placeholder="Search by Location">
+          <input id="search-within-time" type="button" value="Go">
+         </div>
+</form>
 </div>
 <div id="main">
 	<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
