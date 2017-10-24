@@ -7,11 +7,13 @@
           
         ];
 
+
+
         //view model//
   var ViewModel = function() {
     var self = this;
   self.locations = ko.observableArray(locations);
-  self.currentFilter = ko.observable();
+  //self.currentFilter = ko.observable();
 
 };
 ko.applyBindings(new ViewModel());
@@ -29,6 +31,7 @@ ko.applyBindings(new ViewModel());
         var bounds = new google.maps.LatLngBounds();
 
         for (var i = 0; i < locations.length; i++) {
+         // $('#placelink').append('<a class="marker-link" data-markerid="' + i + '" href="#">' + locations[i].[1]+ '</a> ');
           var position = locations[i].location;
           var title = locations[i].title;
           var lat = locations[i].location.lat;
@@ -65,8 +68,24 @@ ko.applyBindings(new ViewModel());
           });
         }
       }
-      
 
+    /*  function placelink (title){
+          console.log(title);
+          $(document).ready(function() {
+          //open infowindo for the tiltle selected
+          for (var i =0; i< markers.length; i++){
+           if (markers[i].title == title){
+          populateInfoWindow(markers[i], Infowindow);
+            }
+          }
+});
+       } */
+
+
+       /*  $('.marker-link').on('click', function () {
+        google.maps.event.trigger(markers[$(this).data('markerid')], 'click');
+    });
+*/
 function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
     document.getElementById("main").style.marginLeft = "250px";
@@ -79,13 +98,12 @@ function closeNav() {
     document.body.style.backgroundColor = "white";
 }
 
-
  //3rd party//
  function loadData(){
   $wikiElem = $('#wikipedia-links');
   $wikiElem.text("");
  }
-  var getPosition = function(title){
+  var getLocationInfo = function(title){
     var wikipedia = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' +title + '&format=json&callback=wikiCallback';
 
         $.ajax({
