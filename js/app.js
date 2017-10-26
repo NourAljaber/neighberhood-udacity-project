@@ -1,37 +1,89 @@
     var locations = [
-          {title: 'Kingdom Center', location: {lat: 24.711534, lng: 46.674345}},
-          {title: 'Abraj Al Bait', location: {lat: 21.418751, lng: 39.825556}},
-          {title: 'Tahliha Street', location: {lat: 21.546254, lng: 39.130543}},
-          {title: 'Quba Mosque', location: {lat: 24.439247, lng: 39.617289}},
-          {title: 'Madain Saleh', location: {lat: 26.804012, lng: 37.957270}}
+          {title: 'Kingdom Center', location: {lat: 24.711534, lng: 46.674345} ,description: ''},
+          {title: 'Abraj Al Bait', location: {lat: 21.418751, lng: 39.825556} ,description: ''},
+          {title: 'Tahliha Street', location: {lat: 21.546254, lng: 39.130543},description: ''},
+          {title: 'Quba Mosque', location: {lat: 24.439247, lng: 39.617289},description: ''},
+          {title: 'Madain Saleh', location: {lat: 26.804012, lng: 37.957270},description: ''}
           
         ];
 
+ //3rd party//
+
+  var getLocationInfo = function(obj){
+    var wikipedia = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' +obj.title + '&format=json&callback=wikiCallback';
+
+        $.ajax({
+            url: wikipedia ,
+            dataType: 'jsonp',
+            success: function(response){
+              var titleList = response[1];
+               for (var i = 0; i < titleList.length; i++) {
+                titleLink = titleList[i];
+                var url = 'http://en.wikipedia.org/wiki/' + titleLink;
+                
+               obj.description = url;
+               };
+            //error: function() {
+
+     // };          
+       }
+        });
+  }; 
+function loadInfo(){
+for ( var j=0; j < locations.length; j++ ){
+  getLocationInfo(locations[j]);
+}
+}
+loadInfo();
 
 
         //view model//
+
   var ViewModel = function() {
     var self = this;
-  self.locations = ko.observableArray(locations);
-  //self.currentFilter = ko.observable();
-
+ // self.locations = ko.observableArray(locations);
+ self.currentFilter = ko.observable(); 
+ // code 1
+    /*  self.locations = ko.computed(function() {
+        if(!self.currentFilter()) {
+            return self.locations(); 
+        } else {
+            return ko.utils.arrayFilter(self.locations(), function(prod) {
+                return prod.genre == self.currentFilter();
+            });
+        }
+    });
+*/
+     // code 2
+   self.locations = ko.computed(function() {
+    console.log(self.currentFilter);
+    if (!currentFilter) {
+        return self.locations();
+    } 
+    else {
+        return ko.utils.arrayFilter(self.locations(), function(loc) {
+            return ko.utils.stringStartsWith(loc.title().toLowerCase(), currentFilter);
+        });
+    }
+});
 };
-ko.applyBindings(new ViewModel());
+
+       // map and marker //
 
          var map;
       var markers = [];
-      //var placeMarker = [];
+      var Infowindow;
+
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
           center: {lat: 23.885942, lng: 45.079162},
           zoom: 13
         });
        
-        var Infowindow = new google.maps.InfoWindow();
         var bounds = new google.maps.LatLngBounds();
+        Infowindow = new google.maps.InfoWindow();
 
         for (var i = 0; i < locations.length; i++) {
-         // $('#placelink').append('<a class="marker-link" data-markerid="' + i + '" href="#">' + locations[i].[1]+ '</a> ');
           var position = locations[i].location;
           var title = locations[i].title;
           var lat = locations[i].location.lat;
@@ -61,16 +113,26 @@ ko.applyBindings(new ViewModel());
       function populateInfoWindow(marker, infowindow) {
         if (infowindow.marker != marker) {
           infowindow.marker = marker;
-          infowindow.setContent('<div>' + marker.title + '</div>' + '( '+ marker.lat +'   ,   '+ marker.lng  + ' )' );
+          var description;
+          for (var x= 0 ; x < locations.length; x++){
+            if (locations[x].title == marker.title){
+              description = locations[x].description;
+              marker.setAnimation(google.maps.Animation.BOUNCE); // marker once click
+              setTimeout(function(){ marker.setAnimation(null); }, 750); // time to stop marker anmation after the click
+    };
+            
+            }
+          }
+          infowindow.setContent('<div>' + marker.title + '</div>' + '<div>( '+ marker.lat +'   ,   '+ marker.lng  + ' )</div> <div> <a href =" '+ description + '" > click here for more </div>' );
           infowindow.open(map, marker);
           infowindow.addListener('closeclick',function(){
             infowindow.setMarker = null;
           });
         }
-      }
+      
 
-    /*  function placelink (title){
-          console.log(title);
+      function placelink (title){
+          console.log(markers);
           $(document).ready(function() {
           //open infowindo for the tiltle selected
           for (var i =0; i< markers.length; i++){
@@ -79,13 +141,9 @@ ko.applyBindings(new ViewModel());
             }
           }
 });
-       } */
+       } 
 
 
-       /*  $('.marker-link').on('click', function () {
-        google.maps.event.trigger(markers[$(this).data('markerid')], 'click');
-    });
-*/
 function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
     document.getElementById("main").style.marginLeft = "250px";
@@ -98,37 +156,14 @@ function closeNav() {
     document.body.style.backgroundColor = "white";
 }
 
- //3rd party//
- function loadData(){
-  $wikiElem = $('#wikipedia-links');
-  $wikiElem.text("");
- }
-  var getLocationInfo = function(title){
-    var wikipedia = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' +title + '&format=json&callback=wikiCallback';
-
-        $.ajax({
-            url: wikiUrl,
-            dataType: 'jsonp',
-            success: function(response){
-              var articleList = response[1];
-               for (var i = 0; i < articleList.length; i++) {
-                articaleStr = articleList[i];
-                var url = 'http://en.wikipedia,org/wiki/' + articaleStr;
-                $wikiElem.append('<li><a> href="' + url + '">' +articaleStr + '</a></li>');
-
-               };
-            }
-        });
-  }; 
-
+//handel error //
+ 
 $('#map')
 .error(function() {
    alert( "Ops! API not loaded" )
 });
 
-  /* .error(function() {
-   wikiElem.text(' wikipedia information could Not be loaded');
-});
- */
 
+
+ko.applyBindings(new ViewModel());
 

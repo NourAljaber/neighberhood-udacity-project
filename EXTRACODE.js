@@ -224,3 +224,84 @@ var searchBox = new google.maps.places.searchBox(
         }
       }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+this.currentFilter = ko.computed( function() {
+    var filter = self.currentFilter().toLowerCase();
+    if (!filter) {
+      self.locations().forEach(function(locationItem){
+        locationItem.visible(true);
+      });
+      return self.locations();
+    } else {
+      return ko.utils.arrayFilter(self.locationList(), function(locationItem) {
+        var string = locationItem.title.toLowerCase();
+        var result = (string.search(filter) >= 0);
+        locationItem.visible(result);
+        return result;
+      });
+    }
+  }, self);
+
+
+
+
+
+
+
+
+
+
+
+
+.fail(function() {
+                // Send alert
+                alert(
+                    "There was an issue loading the Foursquare API. Please refresh your page to try again."
+                );
+
+
+
+                .fail(function() {
+    alert( "error" );
+  })
+
+
+
+9
+$.ajax({
+        url: "/backend/data/ajax1.htm",
+        success: function(){
+                //your code here
+        },
+        error: function(){
+                //your code here
+        }
+}
+
+
+
+
+//filter the items using the filter text
+self.filteredItems = ko.computed(function() {
+    var filter = this.filter().toLowerCase();
+    if (!filter) {
+        return this.locations();
+    } 
+    else {
+        return ko.utils.arrayFilter(this.locations(), function(loc) {
+            return ko.utils.stringStartsWith(loc.title().toLowerCase(), filter);
+        });
+    }
+});
