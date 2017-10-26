@@ -8,7 +8,7 @@
         ];
 
  //3rd party//
-
+//var currentFilter = '';
   var getLocationInfo = function(obj){
     var wikipedia = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' +obj.title + '&format=json&callback=wikiCallback';
 
@@ -41,31 +41,25 @@ loadInfo();
 
   var ViewModel = function() {
     var self = this;
- // self.locations = ko.observableArray(locations);
- self.currentFilter = ko.observable(); 
- // code 1
-    /*  self.locations = ko.computed(function() {
-        if(!self.currentFilter()) {
-            return self.locations(); 
-        } else {
-            return ko.utils.arrayFilter(self.locations(), function(prod) {
-                return prod.genre == self.currentFilter();
-            });
-        }
-    });
-*/
-     // code 2
-   self.locations = ko.computed(function() {
-    console.log(self.currentFilter);
+  self.locations = ko.observableArray(locations);
+ self.currentFilter = ko.observable(''); 
+   self.displayedLocation = ko.computed(function() {
+    var currentFilter = self.currentFilter().toLowerCase();
     if (!currentFilter) {
         return self.locations();
     } 
     else {
+        // remove all markers
         return ko.utils.arrayFilter(self.locations(), function(loc) {
-            return ko.utils.stringStartsWith(loc.title().toLowerCase(), currentFilter);
+            if(loc.title.toLowerCase().indexOf(currentFilter) != -1){
+                // add the marker of loc
+                return loc;
+                return currentFilter;
+                
+            }
         });
     }
-});
+}, this);
 };
 
        // map and marker //
@@ -166,4 +160,3 @@ $('#map')
 
 
 ko.applyBindings(new ViewModel());
-

@@ -33,17 +33,14 @@
 		<a class="fonts">Location</a>
 	</ul>
 	<ul class="list-group" data-bind="foreach: locations">
-		<a href="#" id ="placelink" class="list-group-item list-group-item-action" data-bind="text: title ,click:placelink(title)
-"></a>
+		<a href="#" id ="placelink" class="list-group-item list-group-item-action" data-bind="text: title ,click:placelink(title)"></a>
 	</ul>
 </div> 
 									<!-- Search box  -->
-<form>
 <div>
           <input id="search-within-time-text" type="text" placeholder="Search by Location" data-bind="value: currentFilter" >
-          <input id="search-within-time" type="button" value="Go"> 
+         <!-- <input id="search-within-time" type="button" value="Go"> -->
          </div>
-</form>
 </div>
 <div id="main">
 	<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
