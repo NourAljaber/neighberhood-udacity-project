@@ -89,8 +89,8 @@ var ViewModel = function() {
         var match = loc.title.toLowerCase().indexOf(currentFilter) != -1; // true or false
         
        // console.log(loc.title, currentFilter, match);
-        if (loc.marker) loc.marker.setVisible(match) // true or false
-
+         if (loc.marker) 
+        loc.marker.setVisible(match);
         return match;
       });
 
@@ -139,11 +139,12 @@ function initMap() {
 
     viewModel.locations()[i].marker = marker;
     markers.push(marker);
-    marker.addListener('click', function() {
-      populateInfoWindow(this, Infowindow);
-    });
     bounds.extend(markers[i].position);
   }
+      marker.addListener('click', function() {
+      populateInfoWindow(this, Infowindow);
+    });
+
   map.fitBounds(bounds);
 }
 
@@ -156,12 +157,13 @@ function populateInfoWindow(marker, infowindow) {
       if (locations[x].title == marker.title) {
         description = locations[x].description;
         marker.setAnimation(google.maps.Animation.BOUNCE); // marker once click
-        setTimeout(function() {
-          marker.setAnimation(null);
-        }, 750); // time to stop marker anmation after the click
+       
       }
 
     }
+     setTimeout(function() {
+          marker.setAnimation(null);
+        }, 750); // time to stop marker anmation after the click
   }
   infowindow.setContent('<div>' + marker.title + '</div>' + '<div>( ' + marker.lat + '   ,   ' + marker.lng + ' )</div> <div> <a href =" ' + description + '" > click here for more </div>');
   infowindow.open(map, marker);
