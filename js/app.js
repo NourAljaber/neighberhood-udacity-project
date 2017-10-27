@@ -7,7 +7,7 @@
           
         ];
 
- //3rd party//
+
 //var currentFilter = '';
   var getLocationInfo = function(obj){
     var wikipedia = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' +obj.title + '&format=json&callback=wikiCallback';
@@ -54,8 +54,7 @@ loadInfo();
             if(loc.title.toLowerCase().indexOf(currentFilter) != -1){
                 // add the marker of loc
                 return loc;
-                return currentFilter;
-                
+
             }
         });
     }
