@@ -59,7 +59,7 @@ var getLocationInfo = function(obj) {
         titleLink = titleList[i];
         var url = 'http://en.wikipedia.org/wiki/' + titleLink;
         obj.description = url;
-      };
+      }
               
     }
 
@@ -84,23 +84,22 @@ var ViewModel = function() {
   self.displayedLocation = ko.computed(function() {
     var currentFilter = self.currentFilter().toLowerCase();
 
-    var matchedLocs = []
+    var matchedLocs = [];
       matchedLocs = ko.utils.arrayFilter(self.locations(), function(loc) {
         var match = loc.title.toLowerCase().indexOf(currentFilter) != -1; // true or false
         
-        console.log(loc.title, currentFilter, match);
-
+       // console.log(loc.title, currentFilter, match);
         if (loc.marker) loc.marker.setVisible(match) // true or false
 
         return match;
       });
 
-    return matchedLocs
+    return matchedLocs;
   }, this);
 };
 
 function googleError(){
-     alert( "OPS! google maps API could not be loaded" )
+     alert( "OPS! google maps API could not be loaded" );
 }
 
 // map and marker //
@@ -160,7 +159,7 @@ function populateInfoWindow(marker, infowindow) {
         setTimeout(function() {
           marker.setAnimation(null);
         }, 750); // time to stop marker anmation after the click
-      };
+      }
 
     }
   }
