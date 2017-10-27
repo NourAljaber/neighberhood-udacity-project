@@ -1,11 +1,46 @@
-    var locations = [
-          {title: 'Kingdom Center', location: {lat: 24.711534, lng: 46.674345} ,description: ''},
-          {title: 'Abraj Al Bait', location: {lat: 21.418751, lng: 39.825556} ,description: ''},
-          {title: 'Tahliha Street', location: {lat: 21.546254, lng: 39.130543},description: ''},
-          {title: 'Quba Mosque', location: {lat: 24.439247, lng: 39.617289},description: ''},
-          {title: 'Madain Saleh', location: {lat: 26.804012, lng: 37.957270},description: ''}
-          
-        ];
+var locations = [{
+    title: 'Kingdom Center',
+    location: {
+      lat: 24.711534,
+      lng: 46.674345
+    },
+    description: ''
+  },
+  {
+    title: 'Abraj Al Bait',
+    location: {
+      lat: 21.418751,
+      lng: 39.825556
+    },
+    description: ''
+  },
+  {
+    title: 'Tahliha Street',
+    location: {
+      lat: 21.546254,
+      lng: 39.130543
+    },
+    description: ''
+  },
+  {
+    title: 'Quba Mosque',
+    location: {
+      lat: 24.439247,
+      lng: 39.617289
+    },
+    description: ''
+  },
+  {
+    title: 'Madain Saleh',
+    location: {
+      lat: 26.804012,
+      lng: 37.957270
+    },
+    description: ''
+  }
+
+];
+
 
 
 //var currentFilter = '';
@@ -43,23 +78,26 @@ loadInfo();
     var self = this;
   self.locations = ko.observableArray(locations);
  self.currentFilter = ko.observable(''); 
+
    self.displayedLocation = ko.computed(function() {
     var currentFilter = self.currentFilter().toLowerCase();
-    if (!currentFilter) {
-        return self.locations();
-    } 
-    else {
-        // remove all markers
-        return ko.utils.arrayFilter(self.locations(), function(loc) {
-            if(loc.title.toLowerCase().indexOf(currentFilter) != -1){
-                // add the marker of loc
-                return loc;
+   var matchedlocs = []
+        matchedlocs = ko.utils.arrayFilter(self.locations(), function(loc) {
+          var match =(loc.title.toLowerCase().indexOf(currentFilter) != -1) // true or false
 
-            }
+
+console.log(loc.title,currentFilter, match);
+
+if (loc.marker) loc.marker.setVisible(match); // true or false
+return match;
         });
-    }
+    return matchedlocs;
 }, this);
 };
+
+function googleError(){
+     alert( "OPS! google maps API could not be loaded" )
+}
 
        // map and marker //
 
@@ -151,11 +189,11 @@ function closeNav() {
 
 //handel error //
  
-$('#map')
+/*$('#map')
 .error(function() {
    alert( "Ops! API not loaded" )
 });
+*/
 
-
-
-ko.applyBindings(new ViewModel());
+var viewModel = new ViewModel();
+ko.applyBindings(viewModel);
