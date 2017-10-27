@@ -42,158 +42,162 @@ var locations = [{
 ];
 
 
+var getLocationInfo = function(obj) {
+  var wikipedia = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + obj.title + '&format=json&callback=wikiCallback';
+     var wikiRequestTimeout = setTimeout(function() {
+        alert('there is an errorr with the wikipedia API');
+}, 8000);
+  
+  $.ajax({
+    url: wikipedia,
+    dataType: 'jsonp',
+    success: function(response) {
+      clearTimeout(wikiRequestTimeout);
+      
+      var titleList = response[1];
+      for (var i = 0; i < titleList.length; i++) {
+        titleLink = titleList[i];
+        var url = 'http://en.wikipedia.org/wiki/' + titleLink;
+        obj.description = url;
+      };
+              
+    }
 
-//var currentFilter = '';
-  var getLocationInfo = function(obj){
-    var wikipedia = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' +obj.title + '&format=json&callback=wikiCallback';
+  });
+};
 
-        $.ajax({
-            url: wikipedia ,
-            dataType: 'jsonp',
-            success: function(response){
-              var titleList = response[1];
-               for (var i = 0; i < titleList.length; i++) {
-                titleLink = titleList[i];
-                var url = 'http://en.wikipedia.org/wiki/' + titleLink;
-                
-               obj.description = url;
-               };
-            //error: function() {
-
-     // };          
-       }
-        });
-  }; 
-function loadInfo(){
-for ( var j=0; j < locations.length; j++ ){
-  getLocationInfo(locations[j]);
-}
+function loadInfo() {
+  for (var j = 0; j < locations.length; j++) {
+    getLocationInfo(locations[j]);
+  }
 }
 loadInfo();
 
 
-        //view model//
+//view model//
 
-  var ViewModel = function() {
-    var self = this;
+var ViewModel = function() {
+  var self = this;
   self.locations = ko.observableArray(locations);
- self.currentFilter = ko.observable(''); 
+  self.currentFilter = ko.observable('');
 
-   self.displayedLocation = ko.computed(function() {
+  self.displayedLocation = ko.computed(function() {
     var currentFilter = self.currentFilter().toLowerCase();
-   var matchedlocs = []
-        matchedlocs = ko.utils.arrayFilter(self.locations(), function(loc) {
-          var match =(loc.title.toLowerCase().indexOf(currentFilter) != -1) // true or false
 
+    var matchedLocs = []
+      matchedLocs = ko.utils.arrayFilter(self.locations(), function(loc) {
+        var match = loc.title.toLowerCase().indexOf(currentFilter) != -1; // true or false
+        
+        console.log(loc.title, currentFilter, match);
 
-console.log(loc.title,currentFilter, match);
+        if (loc.marker) loc.marker.setVisible(match) // true or false
 
-if (loc.marker) loc.marker.setVisible(match); // true or false
-return match;
-        });
-    return matchedlocs;
-}, this);
+        return match;
+      });
+
+    return matchedLocs
+  }, this);
 };
 
 function googleError(){
      alert( "OPS! google maps API could not be loaded" )
 }
 
-       // map and marker //
+// map and marker //
 
-         var map;
-      var markers = [];
-      var Infowindow;
+var map;
+var markers = [];
+var Infowindow;
 
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 23.885942, lng: 45.079162},
-          zoom: 13
-        });
-       
-        var bounds = new google.maps.LatLngBounds();
-        Infowindow = new google.maps.InfoWindow();
+function initMap() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: {
+      lat: 23.885942,
+      lng: 45.079162
+    },
+    zoom: 13
+  });
 
-        for (var i = 0; i < locations.length; i++) {
-          var position = locations[i].location;
-          var title = locations[i].title;
-          var lat = locations[i].location.lat;
-          var lng = locations[i].location.lng;
+  var bounds = new google.maps.LatLngBounds();
+  Infowindow = new google.maps.InfoWindow();
 
-          var marker = new google.maps.Marker({
-            map: map,
-            position: position,
-            title: title,
-            lat: lat,
-            lng: lng,
-            draggable: true,
-            animation: google.maps.Animation.DROP,
-            id: i
-          });
+  for (var i = 0; i < locations.length; i++) {
+    var position = locations[i].location;
+    var title = locations[i].title;
+    var lat = locations[i].location.lat;
+    var lng = locations[i].location.lng;
 
-          markers.push(marker);
-          marker.addListener('click' ,function() {
-            populateInfoWindow(this, Infowindow);
-          });
-          bounds.extend(markers[i].position);
-        }
-        map.fitBounds(bounds);
+    var marker = new google.maps.Marker({
+      map: map,
+      position: position,
+      title: title,
+      lat: lat,
+      lng: lng,
+      draggable: true,
+      animation: google.maps.Animation.DROP,
+      id: i
+    });
+
+    viewModel.locations()[i].marker = marker;
+    markers.push(marker);
+    marker.addListener('click', function() {
+      populateInfoWindow(this, Infowindow);
+    });
+    bounds.extend(markers[i].position);
+  }
+  map.fitBounds(bounds);
+}
+
+
+function populateInfoWindow(marker, infowindow) {
+  if (infowindow.marker != marker) {
+    infowindow.marker = marker;
+    var description;
+    for (var x = 0; x < locations.length; x++) {
+      if (locations[x].title == marker.title) {
+        description = locations[x].description;
+        marker.setAnimation(google.maps.Animation.BOUNCE); // marker once click
+        setTimeout(function() {
+          marker.setAnimation(null);
+        }, 750); // time to stop marker anmation after the click
+      };
+
+    }
+  }
+  infowindow.setContent('<div>' + marker.title + '</div>' + '<div>( ' + marker.lat + '   ,   ' + marker.lng + ' )</div> <div> <a href =" ' + description + '" > click here for more </div>');
+  infowindow.open(map, marker);
+  infowindow.addListener('closeclick', function() {
+    infowindow.setMarker = null;
+  });
+}
+
+
+function placelink(title) {
+  console.log(markers);
+  $(document).ready(function() {
+    //open infowindo for the tiltle selected
+    for (var i = 0; i < markers.length; i++) {
+      if (markers[i].title == title) {
+        populateInfoWindow(markers[i], Infowindow);
       }
-
-
-      function populateInfoWindow(marker, infowindow) {
-        if (infowindow.marker != marker) {
-          infowindow.marker = marker;
-          var description;
-          for (var x= 0 ; x < locations.length; x++){
-            if (locations[x].title == marker.title){
-              description = locations[x].description;
-              marker.setAnimation(google.maps.Animation.BOUNCE); // marker once click
-              setTimeout(function(){ marker.setAnimation(null); }, 750); // time to stop marker anmation after the click
-    };
-            
-            }
-          }
-          infowindow.setContent('<div>' + marker.title + '</div>' + '<div>( '+ marker.lat +'   ,   '+ marker.lng  + ' )</div> <div> <a href =" '+ description + '" > click here for more </div>' );
-          infowindow.open(map, marker);
-          infowindow.addListener('closeclick',function(){
-            infowindow.setMarker = null;
-          });
-        }
-      
-
-      function placelink (title){
-          console.log(markers);
-          $(document).ready(function() {
-          //open infowindo for the tiltle selected
-          for (var i =0; i< markers.length; i++){
-           if (markers[i].title == title){
-          populateInfoWindow(markers[i], Infowindow);
-            }
-          }
-});
-       } 
+    }
+  });
+}
 
 
 function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
-    document.getElementById("main").style.marginLeft = "250px";
-    document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
+  document.getElementById("mySidenav").style.width = "250px";
+  document.getElementById("main").style.marginLeft = "250px";
+  document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
 }
 
 function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-    document.getElementById("main").style.marginLeft= "0";
-    document.body.style.backgroundColor = "white";
+  document.getElementById("mySidenav").style.width = "0";
+  document.getElementById("main").style.marginLeft = "0";
+  document.body.style.backgroundColor = "white";
 }
 
-//handel error //
- 
-/*$('#map')
-.error(function() {
-   alert( "Ops! API not loaded" )
-});
-*/
 
 var viewModel = new ViewModel();
+
 ko.applyBindings(viewModel);
