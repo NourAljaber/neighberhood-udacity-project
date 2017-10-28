@@ -139,11 +139,13 @@ function initMap() {
 
     viewModel.locations()[i].marker = marker;
     markers.push(marker);
-    bounds.extend(markers[i].position);
-  }
-      marker.addListener('click', function() {
+    
+   marker.addListener('click', function() {
       populateInfoWindow(this, Infowindow);
     });
+
+    bounds.extend(markers[i].position);
+  }
 
   map.fitBounds(bounds);
 }
