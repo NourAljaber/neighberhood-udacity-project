@@ -174,7 +174,7 @@ function populateInfoWindow(marker, infowindow) {
 
 
 function placelink(title) {
-  console.log(markers);
+  //console.log(markers);
   $(document).ready(function() {
     //open infowindo for the tiltle selected
     for (var i = 0; i < markers.length; i++) {
