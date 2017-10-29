@@ -88,11 +88,10 @@ var ViewModel = function() {
       matchedLocs = ko.utils.arrayFilter(self.locations(), function(loc) {
         var match = loc.title.toLowerCase().indexOf(currentFilter) != -1; // true or false
         
-       // console.log(loc.title, currentFilter, match);
-         if (loc.marker) 
-        loc.marker.setVisible(match);
-        return match;
-      });
+        if (loc.marker) 
+          loc.marker.setVisible(match);
+          return match;
+        });
 
     return matchedLocs;
   }, this);
@@ -140,9 +139,7 @@ function initMap() {
     viewModel.locations()[i].marker = marker;
     markers.push(marker);
     
-   marker.addListener('click', function() {
-      populateInfoWindow(this, Infowindow);
-    });
+    addMarkerEvent(marker);
 
     bounds.extend(markers[i].position);
   }
@@ -151,10 +148,18 @@ function initMap() {
 }
 
 
+
+function addMarkerEvent(marker){
+   marker.addListener('click', function() {
+      populateInfoWindow(marker, Infowindow);
+    });
+}
+
+
 function populateInfoWindow(marker, infowindow) {
+  var description;
   if (infowindow.marker != marker) {
     infowindow.marker = marker;
-    var description;
     for (var x = 0; x < locations.length; x++) {
       if (locations[x].title == marker.title) {
         description = locations[x].description;
@@ -176,7 +181,6 @@ function populateInfoWindow(marker, infowindow) {
 
 
 function placelink(title) {
-  //console.log(markers);
   $(document).ready(function() {
     //open infowindo for the tiltle selected
     for (var i = 0; i < markers.length; i++) {
